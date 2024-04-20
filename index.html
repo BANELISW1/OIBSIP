@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Number Guessing Game</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="main">
+        <h1>Mystery Number Challenge</h1>
+        <h2>Guess The Number Between 1 and <span id="number">100</span></h2>
+        
+        <!-- Form for submitting the guessed number -->
+        <form action="insert_data.php" method="post">
+            <input type="text" name="input" id="input">
+    
+            <button type="submit">Enter</button>
+        </form>
+        
+        <p id="message">Message</p>
+        <p>Attempts Left: <span id="attempts">5</span></p>
+        <p>Score: <span id="score">0</span></p>
+        <p>Round: <span id="round">1</span></p>
+    </div>
+
+    <script>
+        var numberLimit = 100;
+        var attemptsLeft = 5;
+        var score = 0;
+        var round = 1;
+        var randomNumber = generateRandomNumber();
+        document.getElementById("number").innerHTML = numberLimit;
+        document.getElementById("attempts").innerHTML = attemptsLeft;
+        document.getElementById("score").innerHTML = score;
+        document.getElementById("round").innerHTML = round;
+
+        function generateRandomNumber() {
+            return Math.floor(Math.random() * numberLimit) + 1;
+        }
+
+        function CheckInput() {
+            var inputNumber = parseInt(document.getElementById("input").value);
+            var messageElement = document.getElementById("message");
+
+            if (!Number.isInteger(inputNumber)) {
+                messageElement.innerHTML = "Value entered is not a number.";
+                return;
+            }
+
+            if (inputNumber < 1 || inputNumber > numberLimit) {
+                messageElement.innerHTML = "Please enter a valid number between 1 and " + numberLimit + ".";
+                return;
+            }
+
+            attemptsLeft--;
+            document.getElementById("attempts").innerHTML = attemptsLeft;
+
+            if (inputNumber < randomNumber) {
+                messageElement.innerHTML = inputNumber + " is low, go higher";
+            } else if (inputNumber > randomNumber) {
+                messageElement.innerHTML = inputNumber + " is high, go lower";
+            } else {
+                messageElement.innerHTML = "You win! You guessed correctly. It was " + inputNumber + ". Let's play again.";
+                score += attemptsLeft + 1;
+                document.getElementById("score").innerHTML = score;
+
+                if (round < 3) { 
+                    round++;
+                    document.getElementById("round").innerHTML = round;
+                    attemptsLeft = 5;
+                    document.getElementById("attempts").innerHTML = attemptsLeft;
+                    randomNumber = generateRandomNumber();
+                    document.getElementById("input").value = "";
+                } else {
+                    messageElement.innerHTML += " Game Over!";
+                    document.getElementById("input").disabled = true;
+                }
+            }
+
+            if (attemptsLeft === 0 && round < 3) { 
+                messageElement.innerHTML = "Sorry, you've used all your attempts. The number was: " + randomNumber;
+                round++;
+                document.getElementById("round").innerHTML = round;
+                attemptsLeft = 5;
+                document.getElementById("attempts").innerHTML = attemptsLeft;
+                randomNumber = generateRandomNumber();
+                document.getElementById("input").value = "";
+            }
+        }
+
+        document.getElementById("input").addEventListener("keyup", function(e){
+            if (e.key == "Enter") {
+                CheckInput();
+            }
+        });
+    </script> 
+    
+</body>
+</html>
